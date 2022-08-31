@@ -2,13 +2,17 @@ import { MarvelService } from "../../services/MarvelService";
 import React from "react";
 import './randomChar.scss';
 import mjolnir from '../../resources/img/mjolnir.png';
+import { Preloader } from "../preloader/preloader";
+import { ErrorMessage } from '../errorMessage/errorMessage';
 
 class RandomChar extends  React.Component {
     constructor(props){
         super(props);
     }
     state = {
-        char: {}    
+        char: {},
+        loading: true,
+        error: false   
     } 
     
     componentDidMount() {
@@ -16,7 +20,11 @@ class RandomChar extends  React.Component {
     };
 
     onCharLoaded = (char) => {
-        this.setState({char})
+        this.setState({char, loading: false})
+    }
+
+    onError = () => {
+        this.setState({loading: false, error: true})
     }
 
     marvelService = new MarvelService();
@@ -24,31 +32,20 @@ class RandomChar extends  React.Component {
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
         this.marvelService
         .getCharacter(id).then(this.onCharLoaded)
+        .catch(this.onError);
     }
 
     render () {
-        const {char: {name, thymbnail, description, homepage, wiki}} = this.state;
-        
+        const {char, loading, error} = this.state;
+        const errorMessage = error ? <ErrorMessage/> : null;
+        const preloading = loading ? <Preloader/> : null;
+        const content = !(error || loading) ? <View char={char}/> : null;
+
         return (
             <div className="randomchar">
-                <div className="randomchar__block">
-                    <img src={thymbnail} alt="Random character" className="randomchar__img"/>
-                    <div className="randomchar__info">
-                        <p className="randomchar__name">{name}</p>
-                        <p className="randomchar__descr">
-                            {description ? description : 
-                            "This character have no description..."}
-                        </p>
-                        <div className="randomchar__btns">
-                            <a href={homepage} className="button button__main">
-                                <div className="inner">homepage</div>
-                            </a>
-                            <a href={wiki} className="button button__secondary">
-                                <div className="inner">Wiki</div>
-                            </a>
-                        </div>
-                    </div>
-                </div>
+               {preloading}
+               {errorMessage}
+               {content}
                 <div className="randomchar__static">
                     <p className="randomchar__title">
                         Random character for today!<br/>
@@ -68,16 +65,34 @@ class RandomChar extends  React.Component {
     
 }
 
+const View = ({char}) => {
+    const {name, thymbnail, description, homepage, wiki} = char;
+    return (
+      <div className="randomchar__block">
+        <img
+          src={thymbnail}
+          alt="Random character"
+          className="randomchar__img"/>
+        <div className="randomchar__info">
+          <p className="randomchar__name">{name}</p>
+          <p className="randomchar__descr">
+            {description
+              ? description
+              : "This character have no description..."}
+          </p>
+          <div className="randomchar__btns">
+            <a href={homepage} className="button button__main">
+              <div className="inner">homepage</div>
+            </a>
+            <a href={wiki} className="button button__secondary">
+              <div className="inner">Wiki</div>
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+}
+
 export default RandomChar;
 
 
-// // console.log(res.data.results[0].thumbnail.path + '.' + res.data.results[0].thumbnail.extension);
-
-
-// Character.getAllCharacters().then(res => {
-//     res.data.results.forEach(el => {console.log(el.name)});
-
-//  });
-// Character.getCharacter(1011198).then(res => {
-//     console.log(res.data.results);
-//  });
