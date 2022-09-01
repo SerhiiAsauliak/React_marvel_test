@@ -23,9 +23,10 @@ export class MarvelService {
  
   _transformCharacter = (char) => { 
    return {
+      id: char.id,
       name: char.name,
       description: char.description.length > 150 ? char.description.slice(1, 150) + '...' : char.description,
-      thymbnail: char.thumbnail.path + "." + char.thumbnail.extension,
+      thumbnail: char.thumbnail.path + "." + char.thumbnail.extension,
       homepage: char.urls[1].url,
       wiki: char.urls[0].url,
     };

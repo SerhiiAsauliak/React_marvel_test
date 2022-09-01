@@ -6,15 +6,14 @@ import { Preloader } from "../preloader/preloader";
 import { ErrorMessage } from '../errorMessage/errorMessage';
 
 class RandomChar extends  React.Component {
-    constructor(props){
-        super(props);
-    }
     state = {
         char: {},
         loading: true,
         error: false   
     } 
     
+    marvelService = new MarvelService();
+
     componentDidMount() {
         this.updateChar();
     };
@@ -23,13 +22,17 @@ class RandomChar extends  React.Component {
         this.setState({char, loading: false})
     }
 
+    onCharLoading = () => {
+        this.setState({loading: true})
+    }
+
     onError = () => {
         this.setState({loading: false, error: true})
     }
 
-    marvelService = new MarvelService();
     updateChar = () => {
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
+        this.onCharLoading();
         this.marvelService
         .getCharacter(id).then(this.onCharLoaded)
         .catch(this.onError);
@@ -43,8 +46,8 @@ class RandomChar extends  React.Component {
 
         return (
             <div className="randomchar">
-               {preloading}
                {errorMessage}
+               {preloading}
                {content}
                 <div className="randomchar__static">
                     <p className="randomchar__title">
@@ -54,7 +57,7 @@ class RandomChar extends  React.Component {
                     <p className="randomchar__title">
                         Or choose another one
                     </p>
-                    <button className="button button__main">
+                    <button onClick={this.updateChar} className="button button__main">
                         <div className="inner">try it</div>
                     </button>
                     <img src={mjolnir} alt="mjolnir" className="randomchar__decoration"/>
@@ -66,13 +69,14 @@ class RandomChar extends  React.Component {
 }
 
 const View = ({char}) => {
-    const {name, thymbnail, description, homepage, wiki} = char;
+    const {name, thumbnail, description, homepage, wiki} = char;
+
     return (
       <div className="randomchar__block">
-        <img
-          src={thymbnail}
-          alt="Random character"
-          className="randomchar__img"/>
+        <img style={thumbnail.includes('image_not_available') ? {objectFit: 'fill'} : null}
+              src={thumbnail}
+              alt="Random character"
+              className="randomchar__img"/>
         <div className="randomchar__info">
           <p className="randomchar__name">{name}</p>
           <p className="randomchar__descr">
