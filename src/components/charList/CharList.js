@@ -1,6 +1,5 @@
 import React from "react";
 import "./charList.scss";
-import abyss from "../../resources/img/abyss.jpg";
 import { MarvelService } from "../../services/MarvelService";
 import { Preloader } from "../preloader/preloader";
 import { ErrorMessage } from "../errorMessage/errorMessage";
@@ -43,13 +42,15 @@ export class CharList extends React.Component {
     const { chars, loading, error } = this.state;
     const errorMessage = error ? <ErrorMessage /> : null;
     const preloading = loading ? <Preloader /> : null;
-    const content = !(error || loading) ? <CharListItem chars={chars} /> : null;
+    const content = !(error || loading) ? 
+      <CharListItem chars={chars} onCharSelected={this.props.onCharSelected}/>
+      : null;
 
     return (
       <div className="char__list">
+        {errorMessage}
+        {preloading}
         <ul className="char__grid">
-          {errorMessage}
-          {preloading}
           {content}
         </ul>
         <button className="button button__main button__long">

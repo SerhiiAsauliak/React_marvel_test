@@ -5,7 +5,7 @@ import mjolnir from '../../resources/img/mjolnir.png';
 import { Preloader } from "../preloader/preloader";
 import { ErrorMessage } from '../errorMessage/errorMessage';
 
-class RandomChar extends  React.Component {
+export class RandomChar extends  React.Component {
     state = {
         char: {},
         loading: true,
@@ -97,6 +97,6 @@ const View = ({char}) => {
     );
 }
 
-export default RandomChar;
+
 
 

@@ -1,4 +1,4 @@
-export const CharListItem = ({ chars }) => {
+export const CharListItem = ({ chars, onCharSelected }) => {
   const addActiveClass = (e) => {
     e.currentTarget.classList.add("char__item_selected");
   };
@@ -15,6 +15,7 @@ export const CharListItem = ({ chars }) => {
             className={"char__item"}
             onMouseEnter={addActiveClass}
             onMouseLeave={removeActiveClass}
+            onClick={() => onCharSelected(el.id)}
           >
             <img
               src={el.thumbnail}
