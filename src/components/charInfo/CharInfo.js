@@ -1,9 +1,9 @@
 import React from 'react';
+import PropTypes from 'prop-types'
 import { MarvelService } from "../../services/MarvelService";
 import './charInfo.scss';
 import { Preloader } from "../preloader/preloader";
 import { ErrorMessage } from '../errorMessage/errorMessage';
-import thor from '../../resources/img/thor.jpeg';
 import { Skeleton } from './../skeleton/Skeleton';
 
 export class CharInfo extends React.Component {
@@ -49,6 +49,8 @@ export class CharInfo extends React.Component {
         this.setState({loading: false, error: true})
     }
 
+    
+
     render() {
         const {char, loading, error} = this.state;
         const skeleton = char || null || error ? null : <Skeleton/>
@@ -80,10 +82,10 @@ const View = ({char}) => {
                     <div>
                         <div className="char__info-name">{name}</div>
                         <div className="char__btns">
-                            <a href={homepage} className="button button__main">
+                            <a target={'_blank'} href={homepage} className="button button__main">
                                 <div className="inner">Homepage</div>
                             </a>
-                            <a href={wiki} className="button button__secondary">
+                            <a target={'_blank'} href={wiki} className="button button__secondary">
                                 <div className="inner">Wiki</div>
                             </a>
                         </div>
@@ -106,4 +108,8 @@ const View = ({char}) => {
                 </ul>
       </>
     );
+}
+
+CharInfo.propTypes = {
+    charId: PropTypes.number
 }

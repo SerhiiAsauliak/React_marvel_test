@@ -11,15 +11,20 @@ export class CharList extends React.Component {
     loading: true,
     error: false,
     active: false,
+    newItemLoading: false,
+    offset: 210,
+    charEnded: false
   };
 
   marvelService = new MarvelService();
   componentDidMount() {
-    this.updateCharList();
+    this.loadCharList();
   }
 
   onCharListLoading = () => {
-    this.setState({ loading: true });
+    this.setState({ 
+      loading: true,
+      newItemLoading: true });
   };
 
   onError = () => {
@@ -27,10 +32,13 @@ export class CharList extends React.Component {
   };
 
   onCharListLoaded = (chars) => {
-    this.setState({ chars, loading: false });
+    this.setState({ 
+      chars, 
+      loading: false, 
+      newItemLoading: false });
   };
 
-  updateCharList = () => {
+  loadCharList = () => {
     this.onCharListLoading();
     this.marvelService
       .getAllCharacters()
@@ -38,8 +46,31 @@ export class CharList extends React.Component {
       .catch(this.onError);
   };
 
+  updateCharList = (offset) => {
+    console.log(offset);
+    this.onCharListLoading();
+    this.marvelService
+      .getAllCharacters(offset + 9)
+      .then(this.onCharListUpdated)
+      .catch(this.onError);
+  };
+
+  onCharListUpdated = (newCharList) => {
+    let ended = false;
+    if (newCharList.length < 9) {
+        ended = true;
+    }
+    this.setState(({offset, chars}) => ({
+        chars: [...chars, ...newCharList],
+        loading: false,
+        newItemLoading: false,
+        offset: offset + 9,
+        charEnded: ended
+    }))
+}
+
   render() {
-    const { chars, loading, error } = this.state;
+    const { chars, loading, error, offset, newItemLoading, charEnded } = this.state;
     const errorMessage = error ? <ErrorMessage /> : null;
     const preloading = loading ? <Preloader /> : null;
     const content = !(error || loading) ? 
@@ -53,7 +84,11 @@ export class CharList extends React.Component {
         <ul className="char__grid">
           {content}
         </ul>
-        <button className="button button__main button__long">
+        <button className="button button__main button__long" 
+                disabled={newItemLoading}
+                style={{'display': charEnded ? 'none' : 'block'}}
+                onClick={() => this.updateCharList(offset)}
+                >
           <div className="inner">load more</div>
         </button>
       </div>
