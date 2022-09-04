@@ -10,12 +10,17 @@ export const CharListItem = ({ chars, onCharSelected }) => {
     <>
       {chars.map((el) => {
         return (
-          <li
+          <li tabIndex="0"
             key={el.id}
             className={"char__item"}
             onMouseEnter={addActiveClass}
+            onFocus={addActiveClass}
+            onBlur={removeActiveClass}
             onMouseLeave={removeActiveClass}
             onClick={() => onCharSelected(el.id)}
+            onKeyDown={(e) => {
+              return e.keyCode !== 13 || onCharSelected(el.id)}
+            }
           >
             <img
               src={el.thumbnail}

@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from 'prop-types';
 import "./charList.scss";
 import { MarvelService } from "../../services/MarvelService";
 import { Preloader } from "../preloader/preloader";
@@ -95,3 +96,8 @@ export class CharList extends React.Component {
     );
   }
 }
+
+CharList.propTypes = {
+  onCharSelected: PropTypes.func.isRequired
+}
+
