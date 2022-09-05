@@ -48,7 +48,6 @@ export class CharList extends React.Component {
   };
 
   updateCharList = (offset) => {
-    console.log(offset);
     this.onCharListLoading();
     this.marvelService
       .getAllCharacters(offset + 9)
