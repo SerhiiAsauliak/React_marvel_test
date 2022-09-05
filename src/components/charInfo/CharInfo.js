@@ -1,115 +1,120 @@
-import React from 'react';
-import PropTypes from 'prop-types'
+import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import { MarvelService } from "../../services/MarvelService";
-import './charInfo.scss';
+import "./charInfo.scss";
 import { Preloader } from "../preloader/preloader";
-import { ErrorMessage } from '../errorMessage/errorMessage';
-import { Skeleton } from './../skeleton/Skeleton';
+import { ErrorMessage } from "../errorMessage/errorMessage";
+import { Skeleton } from "./../skeleton/Skeleton";
 
-export class CharInfo extends React.Component {
+const CharInfo = (props) => {
+  const [char, setChar] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
-    state = {
-        char: null,
-        loading: false,
-        error: false,
-    };
+  const marvelService = new MarvelService();
 
-    marvelService = new MarvelService();
+  useEffect(() => {
+    updateChar();
+  }, []);
 
-    componentDidMount() {
-        this.updateChar();
+  useEffect(() => {
+    updateChar();
+  }, [props.charId]);
+
+  const updateChar = () => {
+    const { charId } = props;
+    if (!charId) {
+      return;
     }
+    onCharLoading();
+    marvelService.getCharacter(charId).then(onCharLoaded).catch(onError);
+  };
 
-    componentDidUpdate(prevProps, prevstate) {
-        if(this.props.charId !== prevProps.charId){
-            this.updateChar();
-        }
-    }
+  const onCharLoaded = (char) => {
+    setChar(char);
+    setLoading((loading) => false);
+  };
 
-    updateChar = () => {
-        const {charId} = this.props;
-        if(!charId){
+  const onCharLoading = () => {
+    setLoading((loading) => true);
+  };
+
+  const onError = () => {
+    setLoading((loading) => false);
+    setError((error) => true);
+  };
+
+  const skeleton = char || null || error ? null : <Skeleton />;
+  const errorMessage = error ? <ErrorMessage /> : null;
+  const preloading = loading ? <Preloader /> : null;
+  const content = !(error || loading || !char) ? <View char={char} /> : null;
+
+  return (
+    <div className="char__info">
+      {skeleton}
+      {errorMessage}
+      {preloading}
+      {content}
+    </div>
+  );
+};
+
+const View = ({ char }) => {
+  const { name, thumbnail, description, homepage, wiki, comics } = char;
+
+  return (
+    <>
+      <div className="char__basics">
+        <img
+          src={thumbnail}
+          alt={name}
+          style={
+            thumbnail.includes("image_not_available")
+              ? { objectFit: "fill" }
+              : null
+          }
+        />
+        <div>
+          <div className="char__info-name">{name}</div>
+          <div className="char__btns">
+            <a
+              target={"_blank"}
+              href={homepage}
+              className="button button__main"
+            >
+              <div className="inner">Homepage</div>
+            </a>
+            <a
+              target={"_blank"}
+              href={wiki}
+              className="button button__secondary"
+            >
+              <div className="inner">Wiki</div>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div className="char__descr">{description}</div>
+      <div className="char__comics">Comics:</div>
+      <ul className="char__comics-list">
+        {comics.length > 0 ? null : "This character dont have description..."}
+        {comics.map((el, i) => {
+          if (i >= 10) {
             return;
-        }
-        this.onCharLoading();
-        this.marvelService
-        .getCharacter(charId).then(this.onCharLoaded)
-        .catch(this.onError);
-    }
+          }
+          return (
+            <li key={i} className="char__comics-item">
+              {el.name}
+            </li>
+          );
+        })}
+      </ul>
+    </>
+  );
+};
 
-    onCharLoaded = (char) => {
-        this.setState({char, loading: false})
-    }
-
-    onCharLoading = () => {
-        this.setState({loading: true})
-    }
-
-    onError = () => {
-        this.setState({loading: false, error: true})
-    }
-
-    
-
-    render() {
-        const {char, loading, error} = this.state;
-        const skeleton = char || null || error ? null : <Skeleton/>
-        const errorMessage = error ? <ErrorMessage/> : null;
-        const preloading = loading ? <Preloader/> : null;
-        const content = !(error || loading || !char) ? <View char={char}/> : null;
-
-        return (
-            <div className="char__info">
-                {skeleton}
-                {errorMessage}
-                {preloading}
-                {content}
-            </div>
-        )
-    }
-    
-}
-
-const View = ({char}) => {
-    const {name, thumbnail, description, homepage, wiki, comics} = char;
-
-    return (
-      <>
-        <div className="char__basics">
-                    <img src={thumbnail} alt={name} 
-                            style={thumbnail.includes('image_not_available')
-                             ? {objectFit: 'fill'} : null}/>
-                    <div>
-                        <div className="char__info-name">{name}</div>
-                        <div className="char__btns">
-                            <a target={'_blank'} href={homepage} className="button button__main">
-                                <div className="inner">Homepage</div>
-                            </a>
-                            <a target={'_blank'} href={wiki} className="button button__secondary">
-                                <div className="inner">Wiki</div>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div className="char__descr">
-                    {description}
-                </div>
-                <div className="char__comics">Comics:</div>
-                <ul className="char__comics-list">
-                    {comics.length > 0 ? null : "This character dont have description..."}
-                    {comics.map((el, i) => {
-                        if(i >=10){
-                            return;
-                        }
-                        return <li key={i} className="char__comics-item">
-                        {el.name}
-                    </li>
-                    })}
-                </ul>
-      </>
-    );
-}
+export default CharInfo;
 
 CharInfo.propTypes = {
-    charId: PropTypes.number
-}
+  charId: PropTypes.number,
+};

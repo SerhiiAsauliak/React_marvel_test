@@ -10,7 +10,8 @@ export const CharListItem = ({ chars, onCharSelected }) => {
     <>
       {chars.map((el) => {
         return (
-          <li tabIndex="0"
+          <li
+            tabIndex="0"
             key={el.id}
             className={"char__item"}
             onMouseEnter={addActiveClass}
@@ -19,8 +20,8 @@ export const CharListItem = ({ chars, onCharSelected }) => {
             onMouseLeave={removeActiveClass}
             onClick={() => onCharSelected(el.id)}
             onKeyDown={(e) => {
-              return e.keyCode !== 13 || onCharSelected(el.id)}
-            }
+              return e.keyCode !== 13 || onCharSelected(el.id);
+            }}
           >
             <img
               src={el.thumbnail}
