@@ -15,35 +15,24 @@ const CharList = (props) => {
   const{loading, error, clearError, getAllCharacters} = useMarvelService();
 
   useEffect(() => {
-    loadCharList();
+    loadCharList(offset, true);
   }, []);
 
-  const onCharListLoaded = (chars) => {
-    setChars(chars);
-    setNewItemLoading((newItemLoading) => false);
-  };
-
-  const loadCharList = () => {
-    clearError();
-    setNewItemLoading((newItemLoading) => true);
-    getAllCharacters().then(onCharListLoaded);
-  };
-
-  const updateCharList = (offset, initial) => {
+  const loadCharList = (offset, initial) => {
     clearError();
     initial ? setNewItemLoading(false) : setNewItemLoading(true);
-    getAllCharacters(offset + 9).then(onCharListUpdated)
+    getAllCharacters(offset).then(onCharListLoaded)
   };
 
-  const onCharListUpdated = (newCharList) => {
+  const onCharListLoaded = (newCharList) => {
     let ended = false;
     if (newCharList.length < 9) {
       ended = true;
     }
     setChars([...chars, ...newCharList]);
-    setNewItemLoading((newItemLoading) => false);
-    setOffset(offset + 9);
-    setCharEnded(ended);
+    setNewItemLoading(newItemLoading => false);
+    setOffset(offset => offset + 9);
+    setCharEnded(charEnded => ended);
   };
 
   const errorMessage = error ? <ErrorMessage /> : null;
@@ -59,8 +48,8 @@ const CharList = (props) => {
       <button
         className="button button__main button__long"
         disabled={newItemLoading}
-        style={{ display: charEnded ? "none" : "block" }}
-        onClick={() => updateCharList(offset, true)}
+        style={{ display: charEnded ? "none" : "block"}}
+        onClick={() => loadCharList(offset)}
       >
         <div className="inner">load more</div>
       </button>
