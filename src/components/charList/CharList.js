@@ -1,53 +1,38 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import "./charList.scss";
-import { MarvelService } from "../../services/MarvelService";
+import { useMarvelService } from "../../services/MarvelService";
 import { Preloader } from "../preloader/preloader";
 import { ErrorMessage } from "../errorMessage/errorMessage";
 import { CharListItem } from "../charListItem/charListItem";
 
 const CharList = (props) => {
   const [chars, setChars] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const [active, setActive] = useState(false);
-  const [newItemLoading, setNewItemLoading] = React.useState(false);
+  const [newItemLoading, setNewItemLoading] = useState(false);
   const [offset, setOffset] = useState(210);
   const [charEnded, setCharEnded] = useState(false);
 
-  const marvelService = new MarvelService();
+  const{loading, error, clearError, getAllCharacters} = useMarvelService();
 
   useEffect(() => {
     loadCharList();
   }, []);
 
-  const onCharListLoading = () => {
-    setLoading((loading) => true);
-    setNewItemLoading((newItemLoading) => true);
-  };
-
-  const onError = () => {
-    setLoading((loading) => false);
-    setError(true);
-  };
-
   const onCharListLoaded = (chars) => {
     setChars(chars);
-    setLoading((loading) => false);
     setNewItemLoading((newItemLoading) => false);
   };
 
   const loadCharList = () => {
-    onCharListLoading();
-    marvelService.getAllCharacters().then(onCharListLoaded).catch(onError);
+    clearError();
+    setNewItemLoading((newItemLoading) => true);
+    getAllCharacters().then(onCharListLoaded);
   };
 
-  const updateCharList = (offset) => {
-    onCharListLoading();
-    marvelService
-      .getAllCharacters(offset + 9)
-      .then(onCharListUpdated)
-      .catch(onError);
+  const updateCharList = (offset, initial) => {
+    clearError();
+    initial ? setNewItemLoading(false) : setNewItemLoading(true);
+    getAllCharacters(offset + 9).then(onCharListUpdated)
   };
 
   const onCharListUpdated = (newCharList) => {
@@ -56,28 +41,26 @@ const CharList = (props) => {
       ended = true;
     }
     setChars([...chars, ...newCharList]);
-    setLoading((loading) => false);
     setNewItemLoading((newItemLoading) => false);
     setOffset(offset + 9);
     setCharEnded(ended);
   };
 
   const errorMessage = error ? <ErrorMessage /> : null;
-  const preloading = loading ? <Preloader /> : null;
-  const content = !(error || loading) ? (
-    <CharListItem chars={chars} onCharSelected={props.onCharSelected} />
-  ) : null;
-
+  const preloading = loading && newItemLoading ? <Preloader /> : null;
+  
   return (
     <div className="char__list">
       {errorMessage}
       {preloading}
-      <ul className="char__grid">{content}</ul>
+      <ul className="char__grid">
+        <CharListItem chars={chars} onCharSelected={props.onCharSelected} />
+      </ul>
       <button
         className="button button__main button__long"
         disabled={newItemLoading}
         style={{ display: charEnded ? "none" : "block" }}
-        onClick={() => updateCharList(offset)}
+        onClick={() => updateCharList(offset, true)}
       >
         <div className="inner">load more</div>
       </button>

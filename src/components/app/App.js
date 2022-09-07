@@ -1,11 +1,12 @@
 import React from "react";
 import { AppHeader } from "../appHeader/AppHeader";
+import AppBanner from "../appBanner/AppBanner"
 import { RandomChar } from "../randomChar/RandomChar";
 import  CharList  from "../charList/CharList";
 import CharInfo from "../charInfo/CharInfo";
 import { ErrorBoundary } from "../errorBoundary/ErrorBoundary";
-
 import decoration from "../../resources/img/vision.png";
+import ComicsList from "../comicsList/ComicsList";
 
 export const App = () => {
   const [selectedChar, setChar] = React.useState(null);
@@ -31,6 +32,8 @@ export const App = () => {
           </ErrorBoundary>
         </div>
         <img className="bg-decoration" src={decoration} alt="vision" />
+        {/* <AppBanner/>
+        <ComicsList/> */}
       </main>
     </div>
   );

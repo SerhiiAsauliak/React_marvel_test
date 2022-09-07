@@ -1,48 +1,33 @@
-import { MarvelService } from "../../services/MarvelService";
-import React from "react";
+import { useMarvelService } from "../../services/MarvelService";
+import React, {useEffect, useState} from "react";
 import './randomChar.scss';
 import mjolnir from '../../resources/img/mjolnir.png';
 import { Preloader } from "../preloader/preloader";
 import { ErrorMessage } from '../errorMessage/errorMessage';
 
-export class RandomChar extends  React.Component {
-    state = {
-        char: {},
-        loading: true,
-        error: false   
-    } 
-    
-    marvelService = new MarvelService();
+export const RandomChar = (props) => {
+   
+    const {loading, error, getCharacter, clearError} = useMarvelService();
+    const [char, setChar] = useState(null);
+   
+    useEffect(() => {
+        console.log('update');
+        updateChar();
+    },[])
 
-    componentDidMount() {
-        this.updateChar();
-    };
-
-    onCharLoaded = (char) => {
-        this.setState({char, loading: false})
+    const onCharLoaded = (char) => {
+        setChar(char)
     }
 
-    onCharLoading = () => {
-        this.setState({loading: true})
-    }
-
-    onError = () => {
-        this.setState({loading: false, error: true})
-    }
-
-    updateChar = () => {
+    const updateChar = () => {
+        clearError();
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
-        this.onCharLoading();
-        this.marvelService
-        .getCharacter(id).then(this.onCharLoaded)
-        .catch(this.onError);
+        getCharacter(id).then(onCharLoaded);
     }
 
-    render () {
-        const {char, loading, error} = this.state;
         const errorMessage = error ? <ErrorMessage/> : null;
         const preloading = loading ? <Preloader/> : null;
-        const content = !(error || loading) ? <View char={char}/> : null;
+        const content = !(error || loading || !char) ? <View char={char}/> : null;
 
         return (
             <div className="randomchar">
@@ -57,14 +42,13 @@ export class RandomChar extends  React.Component {
                     <p className="randomchar__title">
                         Or choose another one
                     </p>
-                    <button onClick={this.updateChar} className="button button__main">
+                    <button onClick={updateChar} className="button button__main">
                         <div className="inner">try it</div>
                     </button>
                     <img src={mjolnir} alt="mjolnir" className="randomchar__decoration"/>
                 </div>
             </div>
         )
-    }
     
 }
 
