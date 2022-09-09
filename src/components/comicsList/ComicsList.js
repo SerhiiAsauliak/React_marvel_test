@@ -2,15 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useMarvelService } from '../../services/MarvelService';
 import { Preloader } from "../preloader/preloader";
 import { ErrorMessage } from "../errorMessage/errorMessage";
+
 import './comicsList.scss';
-import uw from '../../resources/img/UW.png';
 
 const ComicsList = () => {
     const [comics, setComics] = useState([]);
     const [newItemLoading, setNewItemLoading] = useState(false);
     const [offset, setOffset] = useState(210);
-    const [charEnded, setCharEnded] = useState(false);
-    const {loading, error, request, clearError, getAllComics} = useMarvelService();
+    const [comicsEnded, setComicsEnded] = useState(false);
+    const {loading, error, clearError, getAllComics} = useMarvelService();
 
     useEffect(() => {
         loadComicsList(offset, true);
@@ -30,7 +30,7 @@ const ComicsList = () => {
         setComics([...comics, ...newComicsList]);
         setNewItemLoading(newItemLoading => false);
         setOffset(offset => offset + 8);
-        setCharEnded(charEnded => ended);
+        setComicsEnded(comicsEnded => ended);
       };  
 
     const errorMessage = error ? <ErrorMessage /> : null;
@@ -41,9 +41,9 @@ const ComicsList = () => {
         {errorMessage}
         {preloading}
         <ul className="comics__grid">
-          {comics.map((comics) => {
+          {comics.map((comics, i) => {
             return (
-              <li key={comics.id} className="comics__item">
+              <li key={i} className="comics__item">
                 <a href="#">
                   <img
                     src={comics.thumbnail}
@@ -58,10 +58,10 @@ const ComicsList = () => {
               </li>
             );
           })}
-          
         </ul>
         <button className="button button__main button__long" 
                 onClick={() => loadComicsList(offset)}
+                style={{'display' : comicsEnded ? 'none' : 'block'}}
                 disabled={newItemLoading}>
           <div className="inner">load more</div>
         </button>
