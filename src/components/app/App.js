@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { AppHeader } from "../appHeader/AppHeader";
 import { ComicsPage, MainPage } from "../pages"
 
@@ -10,14 +10,10 @@ export const App = () => {
       <div className="app">
         <AppHeader />
         <main>
-          <Switch>
-            <Route path="/comics">
-              <ComicsPage/>
-            </Route>
-            <Route path="/">
-              <MainPage/>
-            </Route>
-          </Switch>
+          <Routes>
+            <Route path="/" element={<MainPage/>} />
+            <Route path="/comics" element={<ComicsPage/>} />
+          </Routes>
         </main>
       </div>
     </Router>
