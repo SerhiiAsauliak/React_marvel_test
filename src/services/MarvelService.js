@@ -4,7 +4,6 @@ export const useMarvelService = () => {
   const {loading, error, request, clearError} = useHttp();
 
   const _apiBase = "https://gateway.marvel.com:443/v1/public/";
-  // _apiKey = `apikey=${process.env.REACT_APP_MARVEL_API_KEY}`;
   const _apiKey = `apikey=1fb08867ed447846e91a633ef22365b7`;
   const _baseOffset = 210;
 
@@ -37,15 +36,23 @@ export const useMarvelService = () => {
     // return res.data.results;
   }
   
+  const getComics = async (id) => {
+    const res = await request(`${_apiBase}comics/${id}?${_apiKey}`);
+    return _transformComics(res.data.results[0]);
+   };
+
   const _transformComics = (comics) => { 
     return {
        id: comics.id,
        name: comics.title,
+       pageCount: comics.pageCount,
        price: comics.prices[0].price,
+       language: comics.textObjects.language || 'en-us',
+       descr: comics.description,
        thumbnail: comics.thumbnail.path + "." + comics.thumbnail.extension,
      };
    };
 
-  return {loading, error, clearError, getAllCharacters, getCharacter, getAllComics};
+  return {loading, error, clearError, getAllCharacters, getCharacter, getAllComics, getComics};
 }
 

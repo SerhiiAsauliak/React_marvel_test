@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useMarvelService } from '../../services/MarvelService';
 import { Preloader } from "../preloader/preloader";
 import { ErrorMessage } from "../errorMessage/errorMessage";
+import { Link } from "react-router-dom"
 
 import './comicsList.scss';
 
@@ -44,7 +45,7 @@ const ComicsList = () => {
           {comics.map((comics, i) => {
             return (
               <li key={i} className="comics__item">
-                <a href="#">
+                <Link to={`/comics/${comics.id}`}>
                   <img
                     src={comics.thumbnail}
                     alt="ultimate war"
@@ -54,7 +55,7 @@ const ComicsList = () => {
                     {comics.name}
                   </div>
                   <div className="comics__item-price">{comics.price}</div>
-                </a>
+                </Link>
               </li>
             );
           })}
