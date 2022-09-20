@@ -11,7 +11,6 @@ export const RandomChar = (props) => {
     const [char, setChar] = useState(null);
    
     useEffect(() => {
-        console.log('update');
         updateChar();
     },[])
 

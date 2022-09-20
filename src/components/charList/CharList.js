@@ -4,14 +4,13 @@ import "./charList.scss";
 import { useMarvelService } from "../../services/MarvelService";
 import { Preloader } from "../preloader/preloader";
 import { ErrorMessage } from "../errorMessage/errorMessage";
-import { CharListItem } from "../charListItem/charListItem";
+import { CharListItems } from "../charListItem/CharListItems";
 
 const CharList = (props) => {
   const [chars, setChars] = useState([]);
   const [newItemLoading, setNewItemLoading] = useState(false);
   const [offset, setOffset] = useState(210);
   const [charEnded, setCharEnded] = useState(false);
-
   const{loading, error, clearError, getAllCharacters} = useMarvelService();
 
   useEffect(() => {
@@ -43,7 +42,7 @@ const CharList = (props) => {
       {errorMessage}
       {preloading}
       <ul className="char__grid">
-        <CharListItem chars={chars} onCharSelected={props.onCharSelected} />
+        <CharListItems chars={chars} onCharSelected={props.onCharSelected}/>        
       </ul>
       <button
         className="button button__main button__long"

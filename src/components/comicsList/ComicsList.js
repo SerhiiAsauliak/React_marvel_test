@@ -35,7 +35,7 @@ const ComicsList = () => {
       };  
 
     const errorMessage = error ? <ErrorMessage /> : null;
-    const preloading = loading && newItemLoading ? <Preloader /> : null;  
+    const preloading = loading ? <Preloader /> : null;  
 
     return (
       <div className="comics__list">
