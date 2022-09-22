@@ -21,7 +21,7 @@ export const RandomChar = (props) => {
     const updateChar = () => {
         clearError();
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
-        getCharacter(id).then(onCharLoaded);
+        getCharacter(1011276).then(onCharLoaded);
     }
 
         const errorMessage = error ? <ErrorMessage/> : null;
@@ -53,6 +53,10 @@ export const RandomChar = (props) => {
 
 const View = ({char}) => {
     const {name, thumbnail, description, homepage, wiki} = char;
+    console.log(description);
+    if(description.length > 150){ 
+      description.slice(1, 150) + '...';
+    }  
 
     return (
       <div className="randomchar__block">
