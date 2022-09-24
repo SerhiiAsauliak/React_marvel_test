@@ -1,17 +1,33 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import PropTypes from "prop-types";
 import "./charList.scss";
 import { useMarvelService } from "../../services/MarvelService";
 import { Preloader } from "../preloader/preloader";
-import { ErrorMessage } from "../errorMessage/errorMessage";
-import { CharListItems } from "../charListItem/CharListItems";
+import { ErrorMessage } from "../errorMessage/errorMessage"; 
+import { TransitionGroup, CSSTransition } from "react-transition-group";
+
 
 const CharList = (props) => {
   const [chars, setChars] = useState([]);
   const [newItemLoading, setNewItemLoading] = useState(false);
   const [offset, setOffset] = useState(210);
   const [charEnded, setCharEnded] = useState(false);
-  const{loading, error, clearError, getAllCharacters} = useMarvelService();
+  const{process, setProcess, clearError, getAllCharacters} = useMarvelService();
+
+  const setContent = (process, Component, newItemLoading) => {
+    switch (process) {
+      case 'waiting':
+        return <Preloader />
+      case 'loading':
+        return newItemLoading ? <Component/> : <Preloader />  
+      case 'confirmed':
+        return  <Component/>
+      case 'error':
+        return <ErrorMessage />
+      default:
+        throw new Error('Unexpected process state');
+    }
+  }
 
   useEffect(() => {
     loadCharList(offset, true);
@@ -20,7 +36,9 @@ const CharList = (props) => {
   const loadCharList = (offset, initial) => {
     clearError();
     initial ? setNewItemLoading(false) : setNewItemLoading(true);
-    getAllCharacters(offset).then(onCharListLoaded)
+    getAllCharacters(offset)
+      .then(onCharListLoaded)
+      .then(() => setProcess('confirmed'))
   };
 
   const onCharListLoaded = (newCharList) => {
@@ -34,16 +52,60 @@ const CharList = (props) => {
     setCharEnded(charEnded => ended);
   };
 
-  const errorMessage = error ? <ErrorMessage /> : null;
-  const preloading = loading && newItemLoading ? <Preloader /> : null;
-  
+  const addActiveClass = (e) => {
+    e.currentTarget.classList.add("char__item_selected");
+  };
+  const removeActiveClass = (e) => {
+    e.currentTarget.classList.remove("char__item_selected");
+  };
+
+  const renderItems = arr => {
+    console.log('render');
+    const items = chars.map((el) => {
+      return (
+        <CSSTransition key={el.id} timeout={500} classNames="char__item">
+          <li
+          tabIndex="0"
+          className={"char__item"}
+          onMouseEnter={addActiveClass}
+          onFocus={addActiveClass}
+          onBlur={removeActiveClass}
+          onMouseLeave={removeActiveClass}
+          onClick={() => props.onCharSelected(el.id)}
+          onKeyDown={(e) => {
+            return e.keyCode !== 13 || props.onCharSelected(el.id);
+          }}
+          >
+          <img
+            src={el.thumbnail}
+            style={
+              el.thumbnail.includes("image_not_available")
+                ? { objectFit: "fill" }
+                : null
+            }
+            alt={el.name}
+          />
+          <div className="char__name">{el.name}</div>
+        </li>
+        </CSSTransition>
+      );
+    })
+    return(
+      <ul className="char__grid">
+        <TransitionGroup component={null}>
+          {items}
+        </TransitionGroup>        
+      </ul>
+    )
+  }
+
+  const elements = useMemo(() => {
+    return setContent(process, () => renderItems(chars), newItemLoading)
+  }, [process])
+
   return (
     <div className="char__list">
-      {errorMessage}
-      {preloading}
-      <ul className="char__grid">
-        <CharListItems chars={chars} onCharSelected={props.onCharSelected}/>        
-      </ul>
+      {elements}
       <button
         className="button button__main button__long"
         disabled={newItemLoading}

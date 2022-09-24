@@ -7,7 +7,7 @@ import "./charSearchForm.scss"
 import { ErrorMessage } from '../errorMessage/errorMessage';
 
 export const CharSearchForm = () => {
-   const [char, setChar] = useState();
+   const [char, setChar] = useState(null);
    const {error, loading, getCharacterByName, clearError} = useMarvelService();
 
    const onCharLoaded = (char) => {

@@ -2,12 +2,11 @@ import { useMarvelService } from "../../services/MarvelService";
 import React, {useEffect, useState} from "react";
 import './randomChar.scss';
 import mjolnir from '../../resources/img/mjolnir.png';
-import { Preloader } from "../preloader/preloader";
-import { ErrorMessage } from '../errorMessage/errorMessage';
+import { setContent } from './../utils/setContent';
 
 export const RandomChar = (props) => {
    
-    const {loading, error, getCharacter, clearError} = useMarvelService();
+    const {getCharacter, clearError, process, setProcess} = useMarvelService();
     const [char, setChar] = useState(null);
    
     useEffect(() => {
@@ -21,41 +20,36 @@ export const RandomChar = (props) => {
     const updateChar = () => {
         clearError();
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
-        getCharacter(1011276).then(onCharLoaded);
+        getCharacter(id)
+          .then(onCharLoaded)
+          .then(() => setProcess('confirmed'));
     }
 
-        const errorMessage = error ? <ErrorMessage/> : null;
-        const preloading = loading ? <Preloader/> : null;
-        const content = !(error || loading || !char) ? <View char={char}/> : null;
-
-        return (
-            <div className="randomchar">
-               {errorMessage}
-               {preloading}
-               {content}
-                <div className="randomchar__static">
-                    <p className="randomchar__title">
-                        Random character for today!<br/>
-                        Do you want to get to know him better?
-                    </p>
-                    <p className="randomchar__title">
-                        Or choose another one
-                    </p>
-                    <button onClick={updateChar} className="button button__main">
-                        <div className="inner">try it</div>
-                    </button>
-                    <img src={mjolnir} alt="mjolnir" className="randomchar__decoration"/>
-                </div>
+    return (
+        <div className="randomchar">
+            {setContent(process, View, char)}
+            <div className="randomchar__static">
+                <p className="randomchar__title">
+                    Random character for today!<br/>
+                    Do you want to get to know him better?
+                </p>
+                <p className="randomchar__title">
+                    Or choose another one
+                </p>
+                <button onClick={updateChar} className="button button__main">
+                    <div className="inner">try it</div>
+                </button>
+                <img src={mjolnir} alt="mjolnir" className="randomchar__decoration"/>
             </div>
-        )
+        </div>
+    )
     
 }
 
-const View = ({char}) => {
-    const {name, thumbnail, description, homepage, wiki} = char;
-    console.log(description);
+const View = ({data}) => {
+    let {name, thumbnail, description, homepage, wiki} = data;
     if(description.length > 150){ 
-      description.slice(1, 150) + '...';
+      description = description.slice(1, 150) + '...';
     }  
 
     return (
